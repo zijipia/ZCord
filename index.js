@@ -1,3 +1,3 @@
-const Client = require("./Client");
+const Client = require("./src/Client");
 
 module.exports = { Client };

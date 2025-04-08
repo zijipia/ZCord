@@ -11,8 +11,8 @@
 		"url": "git+https://github.com/zijipia/ZDisc.git"
 	},
 	"keywords": [
-		"@zibot/zihooks",
-		"zihooks"
+		"zdis",
+		"discord"
 	],
 	"author": "Ziji",
 	"license": "ISC",

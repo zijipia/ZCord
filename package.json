@@ -1,0 +1,38 @@
+{
+	"name": "zdis",
+	"version": "0.0.0",
+	"description": "Package support discord",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/zijipia/ZDisc.git"
+	},
+	"keywords": [
+		"@zibot/zihooks",
+		"zihooks"
+	],
+	"author": "Ziji",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/zijipia/ZDisc/issues"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"homepage": "https://github.com/zijipia/ZDisc#readme",
+	"dependencies": {
+		"events": "^3.3.0",
+		"ws": "^8.18.1"
+	},
+	"devDependencies": {
+		"dotenv": "^16.4.5"
+	},
+	"overrides": {
+		"prism-media": {
+			"opusscript": "^0.1.1"
+		}
+	}
+}

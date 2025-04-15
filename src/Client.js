@@ -19,9 +19,9 @@ module.exports = class Client extends EventEmitter {
 			"Content-Type": "application/json",
 		};
 		this.identifyProperties = {
-			os: options.identifyProperties.os || "linux",
-			browser: options.identifyProperties.browser || "node",
-			device: options.identifyProperties.device || "node",
+			os: options.identifyProperties?.os || "linux",
+			browser: options.identifyProperties?.browser || "node",
+			device: options.identifyProperties?.device || "node",
 		};
 		this.isReady = false;
 		if (options._init) this.connect();
@@ -76,7 +76,7 @@ module.exports = class Client extends EventEmitter {
 	async handleMessage(data) {
 		const { t: event, s: seq, op, d: payload } = JSON.parse(data);
 		if (seq) this.sequenceNumber = seq;
-		this.debug("Received message with operation:", op, "event:", event);
+		if (this.listeners("raw").length > 0) this.emit("raw", `[RAW] Received operation: ${op}: ${event}`, payload);
 		switch (op) {
 			case 10:
 				this.heartbeat(payload.heartbeat_interval);
@@ -155,8 +155,8 @@ module.exports = class Client extends EventEmitter {
 		return this.apiRequest(`https://discord.com/api/v10/applications/${this.user.id}/guilds/${guild_id}/commands`, "GET");
 	}
 
-
 	extendInteraction(interaction) {
+		interaction.client = this;
 		interaction.reply = async (content) => this.sendInteractionResponse(interaction.id, interaction.token, content);
 		return interaction;
 	}
@@ -174,6 +174,7 @@ module.exports = class Client extends EventEmitter {
 	//#region Guild
 
 	extendGuild(guild) {
+		guild.client = this;
 		guild.fetchChannels = async () => this.getGuildChannels(guild.id);
 		guild.fetchMembers = async (limit = 1000) => this.getGuildMembers(guild.id, limit);
 		guild.leave = async () => this.leaveGuild(guild.id);
@@ -206,6 +207,7 @@ module.exports = class Client extends EventEmitter {
 	//#region Channel
 
 	extendChannel(channel) {
+		channel.client = this;
 		channel.send = async (content) => this.sendMessage(channel.id, content);
 		return channel;
 	}
@@ -221,6 +223,7 @@ module.exports = class Client extends EventEmitter {
 	//#region Message
 
 	extendMessage(message) {
+		message.client = this;
 		message.reply = async (content) => this.replyMessage(message.id, message.channel_id, content);
 		message.edit = async (content) => this.editMessage(message.id, message.channel_id, content);
 		return message;

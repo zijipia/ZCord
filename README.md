@@ -128,6 +128,18 @@ await client.getGlobalCommands();
 await client.getGuildCommands("GUILD_ID");
 ```
 
+## Debug
+
+```js
+client.on("debug", (message) => {
+	console.log(message);
+});
+
+client.on("raw", (message, d) => {
+	console.log(message, d);
+});
+```
+
 ---
 
 ## 🛠 API Methods

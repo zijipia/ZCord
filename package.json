@@ -25,14 +25,10 @@
 	"homepage": "https://github.com/zijipia/ZDisc#readme",
 	"dependencies": {
 		"events": "^3.3.0",
+		"node-fetch": "^2.7.0",
 		"ws": "^8.18.1"
 	},
 	"devDependencies": {
 		"dotenv": "^16.4.5"
-	},
-	"overrides": {
-		"prism-media": {
-			"opusscript": "^0.1.1"
-		}
 	}
 }

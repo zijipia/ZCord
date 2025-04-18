@@ -1,19 +1,19 @@
-# zdis
+# ZCord
 
-**zdis** is a lightweight Discord API client using direct WebSocket and REST connections to interact with the Discord Gateway,
+**ZCord** is a lightweight Discord API client using direct WebSocket and REST connections to interact with the Discord Gateway,
 without relying on third-party libraries like `discord.js`. It supports message sending, guild/channel/user interaction, and
 responding to interactions.
 
 ## ✨ Installation
 
 ```bash
-npm install zdis
+npm install ZCord
 ```
 
 ## 🔧 Initialization
 
 ```js
-const Client = require("zdis");
+const Client = require("ZCord");
 
 const client = new Client("YOUR_BOT_TOKEN");
 
@@ -166,7 +166,7 @@ client.on("raw", (message, d) => {
 ## 💡 Notes
 
 - The bot must have appropriate permissions to perform certain actions (send message, kick, ban...)
-- `zdis` is a minimal client, not fully supporting all event types and data structures like `discord.js`
+- `ZCord` is a minimal client, not fully supporting all event types and data structures like `discord.js`
 
 ---
 

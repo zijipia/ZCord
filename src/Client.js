@@ -2,15 +2,6 @@ const WebSocket = require("ws");
 const fetch = require("node-fetch");
 const EventEmitter = require("events");
 
-function checkMessegePayload(payload) {
-	if (!payload) throw new Error("Payload is required.");
-	if (typeof payload !== "object") throw new Error("Payload must be an object.");
-	if (!payload.content && !payload.embeds && !payload.files) throw new Error("Payload must contain content, embeds, or files.");
-	if (payload.embeds && !Array.isArray(payload.embeds)) throw new Error("Embeds must be an array.");
-	if (payload.files && !Array.isArray(payload.files)) throw new Error("Files must be an array.");
-	return payload;
-}
-
 module.exports = class Client extends EventEmitter {
 	constructor(token, options = { _init: true, intents: 3276799 }) {
 		super();
@@ -238,6 +229,7 @@ module.exports = class Client extends EventEmitter {
 
 	async sendInteractionResponse(interaction_id, interactionToken, content) {
 		this.debug("sendInteractionResponse called with:", { interaction_id, interactionToken, content });
+		this.checkMessagePayload(content);
 
 		return this.apiRequest(`https://discord.com/api/v10/interactions/${interaction_id}/${interactionToken}/callback`, "POST", {
 			type: 4,
@@ -331,11 +323,9 @@ module.exports = class Client extends EventEmitter {
 
 	async sendMessage(channel_id, content) {
 		this.debug("sendMessage called with:", { channel_id, content });
-		return this.apiRequest(
-			`https://discord.com/api/v10/channels/${channel_id}/messages`,
-			"POST",
-			typeof content === "string" ? { content } : content,
-		);
+		const payload = typeof content === "string" ? { content } : content;
+		this.checkMessagePayload(payload);
+		return this.apiRequest(`https://discord.com/api/v10/channels/${channel_id}/messages`, "POST", payload);
 	}
 
 	async editMessage(message_id, channel_id, newContent) {
@@ -346,9 +336,7 @@ module.exports = class Client extends EventEmitter {
 		}
 
 		const contentPayload = typeof newContent === "string" ? { content: newContent } : newContent;
-		if (!contentPayload || typeof contentPayload.content !== "string") {
-			throw new Error("Invalid content format for editMessage: content should be a string.");
-		}
+		this.checkMessagePayload(contentPayload);
 
 		return this.apiRequest(`https://discord.com/api/v10/channels/${channel_id}/messages/${message_id}`, "PATCH", contentPayload);
 	}
@@ -357,9 +345,7 @@ module.exports = class Client extends EventEmitter {
 		this.debug("replyMessage called with:", { message_id, channel_id, replyContent });
 
 		const responsePayload = typeof replyContent === "string" ? { content: replyContent } : replyContent;
-		if (typeof responsePayload.content !== "string") {
-			throw new Error("Invalid content format for replyMessage.");
-		}
+		this.checkMessagePayload(responsePayload);
 
 		return this.apiRequest(`https://discord.com/api/v10/channels/${channel_id}/messages`, "POST", {
 			...responsePayload,
@@ -449,5 +435,14 @@ module.exports = class Client extends EventEmitter {
 		this.cache._member.clear();
 		this.removeAllListeners();
 		this.debug("Client destroyed");
+	}
+
+	checkMessagePayload(payload) {
+		if (!payload) throw new Error("Payload is required.");
+		if (typeof payload !== "object") throw new Error("Payload must be an object.");
+		if (!payload.content && !payload.embeds && !payload.files) throw new Error("Payload must contain content, embeds, or files.");
+		if (payload.embeds && !Array.isArray(payload.embeds)) throw new Error("Embeds must be an array.");
+		if (payload.files && !Array.isArray(payload.files)) throw new Error("Files must be an array.");
+		return payload;
 	}
 };

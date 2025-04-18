@@ -13,7 +13,7 @@ npm install ZCord
 ## 🔧 Initialization
 
 ```js
-const Client = require("ZCord");
+const Client = require("zcord");
 
 const client = new Client("YOUR_BOT_TOKEN");
 

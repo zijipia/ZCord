@@ -1,28 +1,28 @@
 {
-	"name": "zdis",
+	"name": "zcord",
 	"version": "0.0.0",
-	"description": "Package support discord",
+	"description": "Package support discord API",
 	"main": "index.js",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/zijipia/ZDisc.git"
+		"url": "git+https://github.com/zijipia/ZCord.git"
 	},
 	"keywords": [
-		"zdis",
+		"zcord",
 		"discord"
 	],
 	"author": "Ziji",
 	"license": "ISC",
 	"bugs": {
-		"url": "https://github.com/zijipia/ZDisc/issues"
+		"url": "https://github.com/zijipia/ZCord/issues"
 	},
 	"publishConfig": {
 		"access": "public"
 	},
-	"homepage": "https://github.com/zijipia/ZDisc#readme",
+	"homepage": "https://github.com/zijipia/ZCord#readme",
 	"dependencies": {
 		"events": "^3.3.0",
 		"node-fetch": "^2.7.0",

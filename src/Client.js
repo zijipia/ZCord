@@ -2,6 +2,15 @@ const WebSocket = require("ws");
 const fetch = require("node-fetch");
 const EventEmitter = require("events");
 
+function checkMessegePayload(payload) {
+	if (!payload) throw new Error("Payload is required.");
+	if (typeof payload !== "object") throw new Error("Payload must be an object.");
+	if (!payload.content && !payload.embeds && !payload.files) throw new Error("Payload must contain content, embeds, or files.");
+	if (payload.embeds && !Array.isArray(payload.embeds)) throw new Error("Embeds must be an array.");
+	if (payload.files && !Array.isArray(payload.files)) throw new Error("Files must be an array.");
+	return payload;
+}
+
 module.exports = class Client extends EventEmitter {
 	constructor(token, options = { _init: true, intents: 3276799 }) {
 		super();
@@ -14,6 +23,13 @@ module.exports = class Client extends EventEmitter {
 		this.gatewayUrl = "wss://gateway.discord.gg/?v=10&encoding=json";
 		this.intents = options.intents;
 		this.options = options;
+		this.cache = {
+			_user: new Map(), // user_id -> user
+			_guild: new Map(), // guild_id -> guild
+			_channel: new Map(), // channel_id -> channel
+			_member: new Map(), // `${guild_id}:${user_id}` -> member
+		};
+
 		this.headers = {
 			Authorization: `Bot ${this.token}`,
 			"Content-Type": "application/json",
@@ -76,6 +92,7 @@ module.exports = class Client extends EventEmitter {
 	async handleMessage(data) {
 		const { t: event, s: seq, op, d: payload } = JSON.parse(data);
 		if (seq) this.sequenceNumber = seq;
+
 		if (this.listeners("raw").length > 0) this.emit("raw", `[RAW] Received operation: ${op}: ${event}`, payload);
 		switch (op) {
 			case 10:
@@ -90,9 +107,11 @@ module.exports = class Client extends EventEmitter {
 			case "MESSAGE_CREATE":
 				this.emit("messageCreate", this.extendMessage(payload));
 				break;
+
 			case "INTERACTION_CREATE":
 				this.emit("interactionCreate", this.extendInteraction(payload));
 				break;
+
 			case "READY":
 				this.isReady = true;
 				this.user = payload.user;
@@ -100,10 +119,63 @@ module.exports = class Client extends EventEmitter {
 				this.debug(`Logged in as ${this.user.username}`);
 				this.emit("ready", payload);
 				break;
+
 			case "VOICE_STATE_UPDATE":
 				this.emit("voiceStateUpdate", payload);
+				break;
+
 			case "VOICE_SERVER_UPDATE":
 				this.emit("voiceServerUpdate", payload);
+				break;
+
+			case "PRESENCE_UPDATE":
+				if (payload.user?.id) {
+					this.cache._user.set(payload.user.id, {
+						...this.cache._user.get(payload.user.id),
+						...payload.user,
+						presence: payload,
+					});
+				}
+				this.emit("presenceUpdate", payload);
+				break;
+
+			case "GUILD_CREATE": {
+				const guild = this.extendGuild(payload);
+				this.cache._guild.set(payload.id, guild);
+
+				// Cache channels
+				if (Array.isArray(payload.channels)) {
+					for (const channel of payload.channels) {
+						const extended = this.extendChannel(channel);
+						this.cache._channel.set(channel.id, extended);
+					}
+				}
+
+				// Cache members
+				if (Array.isArray(payload.members)) {
+					for (const member of payload.members) {
+						this.cache._member.set(`${payload.id}:${member.user.id}`, member);
+						this.cache._user.set(member.user.id, member.user);
+					}
+				}
+
+				// Cache presence
+				if (Array.isArray(payload.presences)) {
+					for (const presence of payload.presences) {
+						if (presence.user?.id) {
+							const cached = this.cache._user.get(presence.user.id) || {};
+							this.cache._user.set(presence.user.id, {
+								...cached,
+								...presence.user,
+								presence,
+							});
+						}
+					}
+				}
+
+				this.emit("guildCreate", guild);
+				break;
+			}
 		}
 	}
 
@@ -133,7 +205,7 @@ module.exports = class Client extends EventEmitter {
 	//#region Interaction
 	async registerGlobalCommand(commandData) {
 		this.debug("Registering global slash command", commandData);
-		return this.apiRequest(`https://discord.com/api/v10/applications/${this.user.id}/commands`, "POST", commandData);
+		return this.apiRequest(`https://discord.com/api/v10/applications/${this.user.id}/commands`, "PUT", commandData);
 	}
 
 	async registerGuildCommand(guild_id, commandData) {
@@ -157,6 +229,9 @@ module.exports = class Client extends EventEmitter {
 
 	extendInteraction(interaction) {
 		interaction.client = this;
+		interaction.guild = async () => this.getGuild(interaction.guild_id);
+		interaction.channel = async () => this.getChannel(interaction.channel_id);
+		interaction.user = async () => this.getUser(interaction.user.id);
 		interaction.reply = async (content) => this.sendInteractionResponse(interaction.id, interaction.token, content);
 		return interaction;
 	}
@@ -175,19 +250,23 @@ module.exports = class Client extends EventEmitter {
 
 	extendGuild(guild) {
 		guild.client = this;
-		guild.fetchChannels = async () => this.getGuildChannels(guild.id);
-		guild.fetchMembers = async (limit = 1000) => this.getGuildMembers(guild.id, limit);
+		guild.getGuildChannels = async () => this.getGuildChannels(guild.id);
+		guild.getGuildMembers = async (limit = 1000) => this.getGuildMembers(guild.id, limit);
 		guild.leave = async () => this.leaveGuild(guild.id);
-		guild.fetch = async () => this.getGuild(guild.id);
 		return guild;
 	}
 
 	async getGuild(guild_id) {
 		this.debug("getGuild called with:", guild_id);
 		if (!guild_id) throw new Error("Guild ID is required.");
+
+		if (this.cache._guild.has(guild_id)) return this.cache._guild.get(guild_id);
 		const guild = await this.apiRequest(`https://discord.com/api/v10/guilds/${guild_id}`, "GET");
-		return this.extendGuild(guild);
+		const extended = this.extendGuild(guild);
+		this.cache._guild.set(guild_id, extended);
+		return extended;
 	}
+
 	async getGuildChannels(guild_id) {
 		this.debug("getGuildChannels called with:", guild_id);
 		return this.apiRequest(`https://discord.com/api/v10/guilds/${guild_id}/channels`, "GET");
@@ -195,7 +274,12 @@ module.exports = class Client extends EventEmitter {
 
 	async getGuildMembers(guild_id, limit = 1000) {
 		this.debug("getGuildMembers called with:", { guild_id, limit });
-		return this.apiRequest(`https://discord.com/api/v10/guilds/${guild_id}/members?limit=${limit}`, "GET");
+		const members = await this.apiRequest(`https://discord.com/api/v10/guilds/${guild_id}/members?limit=${limit}`, "GET");
+		for (const member of members) {
+			this.cache._member.set(`${guild_id}:${member.user.id}`, member);
+			this.cache._user.set(member.user.id, member.user);
+		}
+		return members;
 	}
 
 	async leaveGuild(guild_id) {
@@ -215,8 +299,12 @@ module.exports = class Client extends EventEmitter {
 	async getChannel(channel_id) {
 		this.debug("getChannel called with:", channel_id);
 		if (!channel_id) throw new Error("Channel ID is required.");
+
+		if (this.cache._channel.has(channel_id)) return this.cache._channel.get(channel_id);
 		const channel = await this.apiRequest(`https://discord.com/api/v10/channels/${channel_id}`, "GET");
-		return this.extendChannel(channel);
+		const extended = this.extendChannel(channel);
+		this.cache._channel.set(channel_id, extended);
+		return extended;
 	}
 
 	//#endregion
@@ -224,8 +312,13 @@ module.exports = class Client extends EventEmitter {
 
 	extendMessage(message) {
 		message.client = this;
+		message.channel = async () => this.getChannel(message.channel_id);
+		message.guild = async () => this.getGuild(message.guild_id);
+		message.me = async () => this.getUser(message.client.user.id);
+		message.user = async () => this.getUser(message.author.id);
 		message.reply = async (content) => this.replyMessage(message.id, message.channel_id, content);
 		message.edit = async (content) => this.editMessage(message.id, message.channel_id, content);
+		// message.delete = async () => this.deleteMessage(message.channel_id, message.id);
 		return message;
 	}
 
@@ -277,10 +370,20 @@ module.exports = class Client extends EventEmitter {
 	//#endregion
 	//#region User
 
+	extendUser(user) {
+		user.client = this;
+		user.send = async (content) => this.sendDM(user.id, content);
+		return user;
+	}
+
 	async getUser(user_id) {
 		this.debug("getUser called with:", user_id);
 		if (!user_id) throw new Error("User ID is required.");
-		return this.apiRequest(`https://discord.com/api/v10/users/${user_id}`, "GET");
+
+		if (this.cache._user.has(user_id)) return this.extendUser(this.cache._user.get(user_id));
+		const user = await this.apiRequest(`https://discord.com/api/v10/users/${user_id}`, "GET");
+		this.cache._user.set(user_id, user);
+		return this.extendUser(user);
 	}
 
 	async getDMChannel(user_id) {
@@ -325,4 +428,26 @@ module.exports = class Client extends EventEmitter {
 	}
 
 	//#endregion
+	//#region Utility
+
+	async destroy() {
+		this.debug("destroy called");
+		if (this.ws) {
+			this.ws.close(1000, "Client destroyed");
+			this.ws = null;
+		}
+		this.isReady = false;
+		this.user = null;
+		this.guilds = null;
+		this.heartbeatInterval = null;
+		this.sequenceNumber = null;
+		this.intents = null;
+		this.options = null;
+		this.cache._user.clear();
+		this.cache._guild.clear();
+		this.cache._channel.clear();
+		this.cache._member.clear();
+		this.removeAllListeners();
+		this.debug("Client destroyed");
+	}
 };

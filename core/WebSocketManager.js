@@ -1,10 +1,12 @@
 const WebSocket = require("ws");
 
 class WebSocketManager {
-	constructor(client) {
+	#token;
+	constructor(client, token) {
 		this.client = client;
 		this.ws = null;
 		this.heartbeatInterval = null;
+		this.#token = token;
 	}
 
 	connect(retries = 1) {
@@ -35,7 +37,7 @@ class WebSocketManager {
 			JSON.stringify({
 				op: 2,
 				d: {
-					token: this.client.token,
+					token: this.#token,
 					intents: this.client.intents,
 					properties: {
 						os: this.client.options.identifyProperties?.os || "linux",
@@ -74,7 +76,6 @@ class WebSocketManager {
 			case "READY":
 				this.client.isReady = true;
 				this.client.user = payload.user;
-				this.client.guilds = payload.guilds;
 				this.client.debug(`Logged in as ${this.client.user.username}`);
 				this.client.emit("ready", payload);
 				break;
@@ -115,8 +116,8 @@ class WebSocketManager {
 				// Cache members
 				if (Array.isArray(payload.members)) {
 					for (const member of payload.members) {
-						this.client.cache._member.set(`${payload.id}:${member.user.id}`, member);
-						this.client.cache._user.set(member.user.id, member.user);
+						this.client.cache._member.set(`${payload.id}:${member.user.id}`, this.client.extendUser(member));
+						this.client.cache._user.set(member.user.id, this.client.extendUser(member.user));
 					}
 				}
 

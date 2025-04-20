@@ -1,8 +1,10 @@
 const fetch = require("node-fetch");
 
 class ApiManager {
-	constructor(client) {
+	#headers;
+	constructor(client, token) {
 		this.client = client;
+		this.#headers = { Authorization: `Bot ${token}`, "Content-Type": "application/json" };
 	}
 
 	async request(url, method, body) {
@@ -10,7 +12,7 @@ class ApiManager {
 		try {
 			const response = await fetch(url, {
 				method,
-				headers: this.client.headers,
+				headers: this.#headers,
 				body: body ? JSON.stringify(body) : undefined,
 			});
 

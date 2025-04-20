@@ -16,24 +16,103 @@ client.on("ready", () => {
 	// 	type: 1,
 	// 	options: [],
 	// });
-	// setTimeout(() => {
-	// 	// client.cache._member.forEach((member) => {
-	// 	// 	console.log(member.user.username);
-	// 	// });
-	// 	// client.getUser("661968947327008768").then((user) => {
-	// 	// 	// console.log(user);
-	// 	// 	user.send("hello world").then((message) => {
-	// 	// 		console.log(message);
-	// 	// 	});
-	// 	// });
-	// 	// client.cache._channel.forEach((channel) => {
-	// 	// 	console.log(channel.name);
-	// 	// });
-	// }, 1000);
+	setTimeout(async () => {
+		const user = await client.getUser("661968947327008768");
+		console.log(user.getAvatarURL());
+		// client.commandManager.getGlobal().then((commands) => {
+		// 	console.log("Global commands:", commands);
+		// });
+		// client.commandManager.clearGlobalCommands().then(() => {
+		// 	console.log("Deleted command");
+		// });
+		// client.commandManager.registerGlobal([
+		// 	{
+		// 		name: "Play / Add music",
+		// 		type: 3,
+		// 		options: [],
+		// 		integration_types: [0],
+		// 		contexts: [0],
+		// 	},
+		// 	{
+		// 		name: "Quote Image Generation",
+		// 		type: 3,
+		// 		options: [],
+		// 		integration_types: [0, 1],
+		// 		contexts: [0, 1],
+		// 	},
+		// 	{
+		// 		name: "Translate",
+		// 		type: 3,
+		// 		options: [],
+		// 		integration_types: [0, 1],
+		// 		contexts: [0, 1],
+		// 	},
+		// 	{
+		// 		name: "2048",
+		// 		description: "Trò chơi giải đố",
+		// 		type: 1,
+		// 		integration_types: [0, 1],
+		// 		contexts: [0, 1],
+		// 	},
+		// 	{
+		// 		name: "fast-type",
+		// 		description: "Kiểm tra trình độ gõ của bạn",
+		// 		type: 1,
+		// 		integration_types: [0, 1],
+		// 		contexts: [0, 1],
+		// 	},
+		// 	{
+		// 		name: "slots",
+		// 		description: "Trò chơi slots",
+		// 		type: 1,
+		// 		integration_types: [0, 1],
+		// 		contexts: [0, 1],
+		// 	},
+		// 	{
+		// 		name: "snake",
+		// 		description: "Trò chơi rắn săn mồi",
+		// 		type: 1,
+		// 		integration_types: [0, 1],
+		// 		contexts: [0, 1],
+		// 	},
+		// 	{
+		// 		name: "disconnect",
+		// 		description: "Tắt nhạc và rời khỏi kênh thoại",
+		// 		type: 1,
+		// 		options: [],
+		// 		integration_types: [0],
+		// 		contexts: [0],
+		// 	},
+		// 	{
+		// 		name: "launch",
+		// 		description: "Launch app",
+		// 		type: 4,
+		// 		handler: 2,
+		// 		integration_types: [0, 1],
+		// 		contexts: [0, 1, 2],
+		// 	},
+		// ]);
+		// client.commandManager.getGlobal().then((commands) => {
+		// 	console.log("Global commands:", commands);
+		// });
+		// client.cache._member.forEach((member) => {
+		// 	console.log(member.user.username);
+		// });
+		// client.getUser("661968947327008768").then((user) => {
+		// 	// console.log(user);
+		// 	user.send("hello world").then((message) => {
+		// 		console.log(message);
+		// 	});
+		// });
+		// client.cache._channel.forEach((channel) => {
+		// 	console.log(channel.name);
+		// });
+	}, 1000);
 });
 
 client.on("messageCreate", async (message) => {
-	console.log("messageCreate:" + message?.type);
+	console.log("messageCreate:" + message?.type + " " + message?.content);
+	console.log(await message.me());
 	if (message.content === "exit") {
 		client.destroy();
 	}
@@ -61,6 +140,6 @@ client.on("interactionCreate", (interaction) => {
 // 	console.log(message, d);
 // });
 
-// client.on("debug", (...arg) => {
-// 	console.log(...arg);
-// });
+client.on("debug", (...arg) => {
+	console.log(...arg);
+});

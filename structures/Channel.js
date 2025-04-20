@@ -5,7 +5,7 @@ module.exports = function extendChannel(channel, client) {
 		client.debug("sendMessage called with:", { channel_id: channel.id, content });
 		const payload = typeof content === "string" ? { content } : content;
 		client.checkMessagePayload(payload);
-		return client.api.post(`/channels/${channel.id}/messages`, payload);
+		return client.extendMessage(await client.api.post(`/channels/${channel.id}/messages`, payload), client);
 	};
 
 	channel.fetchMessages = async (limit = 50) => {

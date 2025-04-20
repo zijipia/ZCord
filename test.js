@@ -18,7 +18,7 @@ client.on("ready", () => {
 	// });
 	setTimeout(async () => {
 		const user = await client.getUser("661968947327008768");
-		console.log(user.getAvatarURL());
+		// console.log(user.getAvatarURL());
 		// client.commandManager.getGlobal().then((commands) => {
 		// 	console.log("Global commands:", commands);
 		// });
@@ -112,9 +112,18 @@ client.on("ready", () => {
 
 client.on("messageCreate", async (message) => {
 	console.log("messageCreate:" + message?.type + " " + message?.content);
-	console.log(await message.me());
 	if (message.content === "exit") {
 		client.destroy();
+	}
+	if (message.content === "!test") {
+		const msg = await message.reply("Pong! 🏓");
+		const user = await message.user;
+		const avatar = user.getAvatarURL();
+
+		user.send(avatar); //send DM
+		(await message.channel).send(avatar); //send channel
+
+		msg.edit(`${user.username} Avatar:`);
 	}
 	if (message.content === "ping") {
 		const msg = await message.reply("pong");
@@ -140,6 +149,6 @@ client.on("interactionCreate", (interaction) => {
 // 	console.log(message, d);
 // });
 
-client.on("debug", (...arg) => {
-	console.log(...arg);
-});
+// client.on("debug", (...arg) => {
+// 	console.log(...arg);
+// });

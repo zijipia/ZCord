@@ -1,10 +1,9 @@
 module.exports = function extendMessage(message, client) {
 	message.client = client;
 
-	message.channel = async () => client.extendChannel(message.channel_id, client);
-	message.guild = async () => client.extendGuild(message.guild_id, client);
-	message.me = async () => client.api.get(`/users/@me`);
-	message.user = async () => client.extendUser(message.author, client);
+	message.channel = client.getChannel(message.channel_id);
+	message.guild = client.getGuild(message.guild_id ?? message?.message_reference?.guild_id);
+	message.user = client.getUser(message.author?.id);
 
 	message.reply = async (replyContent) => {
 		const payload = typeof replyContent === "string" ? { content: replyContent } : replyContent;
@@ -13,8 +12,7 @@ module.exports = function extendMessage(message, client) {
 			...payload,
 			message_reference: { message_id: message.id },
 		});
-
-		return client.extendMessage(msg, client);
+		return client.extendMessage(msg);
 	};
 
 	message.edit = async (newContent) => {

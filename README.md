@@ -1,175 +1,95 @@
-# ZCord
+# 🧩 Zcord
 
-**ZCord** is a lightweight Discord API client using direct WebSocket and REST connections to interact with the Discord Gateway,
-without relying on third-party libraries like `discord.js`. It supports message sending, guild/channel/user interaction, and
-responding to interactions.
+**Zcord** is a simple client library for Discord that helps you create bots quickly with lower-level control compared to
+`discord.js`.
 
-## ✨ Installation
+---
+
+## 🚀 Features
+
+- Directly connects to the Discord Gateway via WebSocket
+- Sends/receives events such as `messageCreate`, `interactionCreate`, `guildCreate`, ...
+- Uses Discord's REST API to:
+  - Send messages
+  - Create global or guild-specific slash commands
+  - Fetch user, server, and channel information
+- Extends `User`, `Guild`, `Message`, `Channel`, and `Interaction` objects with utility methods
+
+---
+
+## 📦 Installation
 
 ```bash
-npm install ZCord
+npm install zcord
 ```
 
-## 🔧 Initialization
+---
+
+## 🧪 Basic Usage Example
 
 ```js
-const Client = require("zcord");
+const { Client } = require("zcord");
 
 const client = new Client("YOUR_BOT_TOKEN");
 
 client.on("ready", () => {
-	console.log(`Bot logged in as ${client.user.username}`);
+	console.log(`Logged in as ${client.user.username}`);
 });
-```
 
-## 🧠 Supported Events
-
-- `ready`
-- `messageCreate`
-- `interactionCreate`
-- `voiceStateUpdate`
-- `voiceServerUpdate`
-- `debug`
-
-```js
 client.on("messageCreate", async (message) => {
-	console.log(`[MSG] ${message.author.username}: ${message.content}`);
+	if (message.content === "!test") {
+		const msg = await message.reply("Pong! 🏓"); //reply messenger
+		const user = await message.user;
+		const avatar = user.getAvatarURL();
 
-	if (message.content === "!ping") {
-		await message.reply("Pong!");
+		user.send(avatar); //send DM
+		(await message.channel).send(avatar); //send channel
+
+		msg.edit(`${user.username} Avatar:`); //edit messenger
 	}
 });
 ```
 
----
+## 📘 API Documentation
 
-## 💬 Send Messages
-
-```js
-await client.sendMessage(channel_id, "Hello world!");
-```
-
-Or through the message object:
+### Create a client
 
 ```js
-message.reply("Reply content");
-message.edit("Edit content");
+new Client(token: string, options?: ClientOptions)
 ```
 
----
-
-## 📩 Send DM
-
-```js
-await client.sendDM(user_id, "Hello from bot via DM!");
-```
+| Option               | Description                                           |
+| -------------------- | ----------------------------------------------------- |
+| `intents`            | Defaults to `3276799` (all intents)                   |
+| `_init`              | Automatically connects to gateway if `true` (default) |
+| `identifyProperties` | Customize `os`, `browser`, and `device` info          |
 
 ---
 
-## 🔍 Guild
+### Utility Methods
 
-```js
-const guild = await client.getGuild("GUILD_ID");
-const channels = await guild.fetchChannels();
-const members = await guild.fetchMembers();
-
-await guild.leave(); // Leave the server
-```
-
----
-
-## 📺 Channel
-
-```js
-const channel = await client.getChannel("CHANNEL_ID");
-await channel.send("Message sent via channel.send()");
-```
+| Method                                                | Description                      |
+| ----------------------------------------------------- | -------------------------------- |
+| `client.getUser(id)`                                  | Fetch and extend user info       |
+| `client.getChannel(id)`                               | Fetch and extend channel info    |
+| `client.getGuild(id)`                                 | Fetch and extend server info     |
+| `client.getMessage(channelId, messageId)`             | Fetch and extend message         |
+| `client.commandManager.registerGlobal([...])`         | Register global slash commands   |
+| `client.commandManager.registerGuild(guildId, [...])` | Register guild-specific commands |
 
 ---
 
-## 👤 Member
+## 📦 Supported Types
 
-```js
-await client.kickMember(guild_id, user_id, "Reason for kick");
-await client.banMember(guild_id, user_id, "Reason for ban");
-await client.unbanMember(guild_id, user_id);
-```
+Zcord defines the following types:
 
----
-
-## 🤝 Interaction (Slash Command, Button...)
-
-```js
-client.on("interactionCreate", async (interaction) => {
-	await interaction.reply({ content: "Interaction received!" });
-});
-```
-
----
-
-## 📝 Register Slash Command
-
-```js
-await client.registerGlobalCommand({
-	name: "ping",
-	description: "Replies with Pong!",
-	type: 1, // CHAT_INPUT
-});
-
-// For a specific guild:
-await client.registerGuildCommand("GUILD_ID", {
-	name: "ping",
-	description: "Replies with Pong!",
-	type: 1,
-});
-
-await client.getGlobalCommands();
-
-await client.getGuildCommands("GUILD_ID");
-```
-
-## Debug
-
-```js
-client.on("debug", (message) => {
-	console.log(message);
-});
-
-client.on("raw", (message, d) => {
-	console.log(message, d);
-});
-```
-
----
-
-## 🛠 API Methods
-
-| Method                                          | Description                     |
-| ----------------------------------------------- | ------------------------------- |
-| `getGuild(id)`                                  | Fetch guild info                |
-| `getChannel(id)`                                | Fetch channel info              |
-| `getMessage(channel_id, message_id)`            | Fetch specific message          |
-| `getUser(id)`                                   | Fetch user info                 |
-| `getDMChannel(user_id)`                         | Open/fetch DM channel           |
-| `sendDM(user_id, content)`                      | Send a DM                       |
-| `kickMember(guild_id, user_id)`                 | Kick member                     |
-| `banMember(guild_id, user_id)`                  | Ban member                      |
-| `unbanMember(guild_id, user_id)`                | Unban member                    |
-| `sendMessage(channel_id, content)`              | Send a message to a channel     |
-| `editMessage(message_id, channel_id, content)`  | Edit a message                  |
-| `replyMessage(message_id, channel_id, content)` | Reply to a message              |
-| `registerGlobalCommand(commandData)`            | Register a global slash command |
-| `registerGuildCommand(guild_id, commandData)`   | Register guild slash command    |
-
----
-
-## 💡 Notes
-
-- The bot must have appropriate permissions to perform certain actions (send message, kick, ban...)
-- `ZCord` is a minimal client, not fully supporting all event types and data structures like `discord.js`
+- `RawUser`, `RawGuild`, `RawChannel`, `RawMessage`
+- `ExtendedUser`, `ExtendedGuild`, `ExtendedChannel`, `ExtendedMessage`
+- `CommandManager`, `WebSocketManager`
+- `ClientOptions`, `MessagePayload`
 
 ---
 
 ## 📄 License
 
-MIT License
+MIT © 2025 — Ziji

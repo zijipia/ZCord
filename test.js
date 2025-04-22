@@ -1,4 +1,4 @@
-const { Client } = require("./");
+const Client = require("./");
 require("dotenv").config();
 const client = new Client(process.env.TOKEN, {
 	identifyProperties: {
@@ -107,6 +107,8 @@ client.on("ready", () => {
 		// client.cache._channel.forEach((channel) => {
 		// 	console.log(channel.name);
 		// });
+
+		console.log(client.api);
 	}, 1000);
 });
 

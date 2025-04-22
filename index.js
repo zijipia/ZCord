@@ -30,17 +30,7 @@ class Client extends EventEmitter {
 		this.commandManager = new CommandManager(this);
 		this.ws = new WebSocketManager(this, this.#token);
 
-		this.extendGuild = (g) => extendGuild(g, this);
-		this.extendChannel = (c) => extendChannel(c, this);
-		this.extendMessage = (m) => extendMessage(m, this);
-		this.extendUser = (u) => extendUser(u, this);
-		this.extendInteraction = (i) => extendInteraction(i, this);
 		this.checkMessagePayload = checkPayload;
-
-		this.getChannel = (id) => getChannel(id, this);
-		this.getGuild = (id) => getGuild(id, this);
-		this.getUser = (id) => getUser(id, this);
-		this.getMessage = (id) => getMessage(id, this);
 
 		if (options._init ?? true) this.ws.connect();
 	}
@@ -48,6 +38,17 @@ class Client extends EventEmitter {
 	debug(message, ...args) {
 		if (this.listeners("debug").length > 0) this.emit("debug", `[DEBUG] ${message}`, ...args);
 	}
+
+	extendGuild = (g) => extendGuild(g, this);
+	extendChannel = (c) => extendChannel(c, this);
+	extendMessage = (m) => extendMessage(m, this);
+	extendUser = (u) => extendUser(u, this);
+	extendInteraction = (i) => extendInteraction(i, this);
+
+	getChannel = (id) => getChannel(id, this);
+	getGuild = (id) => getGuild(id, this);
+	getUser = (id) => getUser(id, this);
+	getMessage = (id) => getMessage(id, this);
 
 	destroy() {
 		this.ws.destroy();
@@ -63,3 +64,4 @@ class Client extends EventEmitter {
 }
 
 module.exports = { Client };
+module.exports = Client;

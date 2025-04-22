@@ -1,5 +1,5 @@
 module.exports = async function getGuild(guild_id, client) {
-	if (!guild_id) return null;
+	if (!guild_id) throw new Error("Guild ID is required.");
 	if (client.cache._guild.has(guild_id)) return client.cache._guild.get(guild_id);
 
 	client.debug("getGuild called with:", guild_id);

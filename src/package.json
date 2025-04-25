@@ -25,6 +25,7 @@
 	"homepage": "https://github.com/zijipia/ZCord#readme",
 	"dependencies": {
 		"events": "^3.3.0",
+		"form-data": "^4.0.2",
 		"node-fetch": "^2.7.0",
 		"ws": "^8.18.1"
 	},

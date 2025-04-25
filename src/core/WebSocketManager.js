@@ -1,4 +1,5 @@
 const WebSocket = require("ws");
+const { Message, Channel, User, Guild } = require("../structures");
 
 class WebSocketManager {
 	#token;
@@ -44,6 +45,7 @@ class WebSocketManager {
 						browser: this.client.options.identifyProperties?.browser || "node",
 						device: this.client.options.identifyProperties?.device || "node",
 					},
+					presence: this.client.options?.presence,
 				},
 			}),
 		);
@@ -52,7 +54,7 @@ class WebSocketManager {
 	heartbeat(interval) {
 		this.client.debug("Starting heartbeat with interval:", interval);
 		this.heartbeatInterval = setInterval(() => {
-			this.client.debug("Sending heartbeat...");
+			this.client.debug("Sending heartbeat:" + this.client?.sequenceNumber);
 			this.ws.send(JSON.stringify({ op: 1, d: this.client.sequenceNumber }));
 		}, interval);
 	}
@@ -80,7 +82,7 @@ class WebSocketManager {
 				this.client.emit("ready", payload);
 				break;
 			case "MESSAGE_CREATE":
-				this.client.emit("messageCreate", this.client.extendMessage(payload));
+				this.client.emit("messageCreate", new Message(payload, this.client));
 				break;
 			case "INTERACTION_CREATE":
 				this.client.emit("interactionCreate", this.client.extendInteraction(payload));
@@ -93,31 +95,36 @@ class WebSocketManager {
 				break;
 			case "PRESENCE_UPDATE":
 				if (payload.user?.id) {
-					this.client.cache._user.set(payload.user.id, {
-						...this.client.cache._user.get(payload.user.id),
-						...payload.user,
-						presence: payload,
-					});
+					this.client.cache._user.set(
+						payload.user.id,
+						new User(
+							{
+								...this.client.cache._user.get(payload.user.id),
+								...payload.user,
+								presence: payload,
+							},
+							this.client,
+						),
+					);
 				}
 				this.client.emit("presenceUpdate", payload);
 				break;
 			case "GUILD_CREATE": {
-				const guild = this.client.extendGuild(payload);
+				const guild = new Guild(payload, this.client);
 				this.client.cache._guild.set(payload.id, guild);
 
 				// Cache channels
 				if (Array.isArray(payload.channels)) {
 					for (const channel of payload.channels) {
-						const extended = this.client.extendChannel(channel);
-						this.client.cache._channel.set(channel.id, extended);
+						this.client.cache._channel.set(channel.id, new Channel(channel, this.client));
 					}
 				}
 
 				// Cache members
 				if (Array.isArray(payload.members)) {
 					for (const member of payload.members) {
-						this.client.cache._member.set(`${payload.id}:${member.user.id}`, this.client.extendUser(member));
-						this.client.cache._user.set(member.user.id, this.client.extendUser(member.user));
+						this.client.cache._member.set(`${payload.id}:${member.user.id}`, new User(member, this.client));
+						this.client.cache._user.set(member.user.id, new User(member.user, this.client));
 					}
 				}
 
@@ -126,11 +133,17 @@ class WebSocketManager {
 					for (const presence of payload.presences) {
 						if (presence.user?.id) {
 							const cached = this.client.cache._user.get(presence.user.id) || {};
-							this.client.cache._user.set(presence.user.id, {
-								...cached,
-								...presence.user,
-								presence,
-							});
+							this.client.cache._user.set(
+								presence.user.id,
+								new User(
+									{
+										...cached,
+										...presence.user,
+										presence,
+									},
+									this.client,
+								),
+							);
 						}
 					}
 				}

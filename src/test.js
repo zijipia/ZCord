@@ -1,4 +1,6 @@
-const Client = require("./");
+const { Client, Attachment } = require(".");
+const fs = require("fs");
+
 require("dotenv").config();
 const client = new Client(process.env.TOKEN, {
 	identifyProperties: {
@@ -8,6 +10,17 @@ const client = new Client(process.env.TOKEN, {
 	},
 	_init: true,
 	intents: 3276799,
+	presence: {
+		activities: [
+			{
+				name: "Zcordjs",
+				type: 2,
+			},
+		],
+		status: "online",
+		since: Date.now(),
+		afk: false,
+	},
 });
 
 client.on("ready", () => {
@@ -17,7 +30,15 @@ client.on("ready", () => {
 	// 	options: [],
 	// });
 	setTimeout(async () => {
-		const user = await client.getUser("661968947327008768");
+		// const user = await client.getUser("661968947327008768");
+		// const buffer = fs.readFileSync("nyan-cat.gif");
+		// const file1 = new Attachment(buffer, "nyan-cat.gif");
+		// const file2 = new Attachment("./nyan-cat.gif");
+		// console.log(file2);
+		// user.send({
+		// 	content: "Tài liệu đính kèm:",
+		// 	files: [file1, file2],
+		// });
 		// console.log(user.getAvatarURL());
 		// client.commandManager.getGlobal().then((commands) => {
 		// 	console.log("Global commands:", commands);
@@ -107,8 +128,6 @@ client.on("ready", () => {
 		// client.cache._channel.forEach((channel) => {
 		// 	console.log(channel.name);
 		// });
-
-		console.log(client.api);
 	}, 1000);
 });
 
@@ -123,7 +142,7 @@ client.on("messageCreate", async (message) => {
 		const avatar = user.getAvatarURL();
 
 		user.send(avatar); //send DM
-		(await message.channel).send(avatar); //send channel
+		await message.channel.send(message.guild.IconURL); //send channel
 
 		msg.edit(`${user.username} Avatar:`);
 	}
@@ -151,6 +170,6 @@ client.on("interactionCreate", (interaction) => {
 // 	console.log(message, d);
 // });
 
-// client.on("debug", (...arg) => {
-// 	console.log(...arg);
-// });
+client.on("debug", (...arg) => {
+	console.log(...arg);
+});

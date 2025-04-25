@@ -97,6 +97,17 @@ export interface ClientOptions {
 		device?: string;
 	};
 	_init?: boolean;
+	presence?: {
+		activities: [
+			{
+				name: string;
+				type: number;
+			},
+		];
+		status: "online" | "dnd" | "idle" | "invisible";
+		since: number;
+		afk: false;
+	};
 }
 
 export class Client extends EventEmitter {
@@ -139,4 +150,15 @@ export class Client extends EventEmitter {
 	checkMessagePayload: (payload: MessagePayload) => void;
 	debug: (message: string, ...args: any[]) => void;
 	destroy: () => void;
+}
+
+export interface AttachmentData {
+	name?: string;
+	description?: string;
+}
+
+export class Attachment {
+	constructor(file: string | Buffer, data?: AttachmentData);
+	file: string | Buffer;
+	name: string;
 }

@@ -1,4 +1,4 @@
-const { Client, Attachment } = require(".");
+const { Client, Attachment } = require("zcord");
 const fs = require("fs");
 
 require("dotenv").config();

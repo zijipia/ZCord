@@ -13,7 +13,6 @@
   - Send messages
   - Create global or guild-specific slash commands
   - Fetch user, server, and channel information
-- Extends `User`, `Guild`, `Message`, `Channel`, and `Interaction` objects with utility methods
 
 ---
 
@@ -42,13 +41,15 @@ client.on("messageCreate", async (message) => {
 		const user = await message.user;
 		const avatar = user.getAvatarURL();
 
-		user.send(avatar); //send DM
-		(await message.channel).send(avatar); //send channel
+		user.send(message.guild.IconURL); //send DM
+		await message.channel.send(avatar); //send channel
 
 		msg.edit(`${user.username} Avatar:`); //edit messenger
 	}
 });
 ```
+
+[See more example!!!](https://github.com/zijipia/ZCord/tree/main/example)
 
 ## 📘 API Documentation
 

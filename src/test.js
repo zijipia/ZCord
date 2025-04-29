@@ -30,16 +30,30 @@ client.on("ready", () => {
 	// 	options: [],
 	// });
 	setTimeout(async () => {
-		// const user = await client.getUser("661968947327008768");
-		// const buffer = fs.readFileSync("nyan-cat.gif");
-		// const file1 = new Attachment(buffer, "nyan-cat.gif");
-		// const file2 = new Attachment("./nyan-cat.gif");
-		// console.log(file2);
-		// user.send({
-		// 	content: "Tài liệu đính kèm:",
-		// 	files: [file1, file2],
-		// });
-		// console.log(user.getAvatarURL());
+		const user = await client.getUser("661968947327008768");
+		const buffer = fs.readFileSync("nyan-cat.gif");
+		const file1 = new Attachment(buffer, { name: "cat.gif" });
+
+		const file2 = await Attachment.fromUrl(user.getAvatarURL(), { name: "./nyan-cat.gif" });
+		user.send({
+			content: "Tài liệu đính kèm:",
+			files: [file1, file2],
+			embeds: [
+				{
+					title: "meow cat",
+					color: "12255487",
+					description: "This is an embedded message.",
+
+					thumbnail: {
+						url: "attachment://nyan-cat.gif",
+					},
+					image: {
+						url: "attachment://cat.gif",
+					},
+				},
+			],
+		});
+		console.log(user.getAvatarURL());
 		// client.commandManager.getGlobal().then((commands) => {
 		// 	console.log("Global commands:", commands);
 		// });
@@ -170,6 +184,6 @@ client.on("interactionCreate", (interaction) => {
 // 	console.log(message, d);
 // });
 
-client.on("debug", (...arg) => {
-	console.log(...arg);
-});
+// client.on("debug", (...arg) => {
+// 	console.log(...arg);
+// });

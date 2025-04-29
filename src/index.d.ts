@@ -161,4 +161,5 @@ export class Attachment {
 	constructor(file: string | Buffer, data?: AttachmentData);
 	file: string | Buffer;
 	name: string;
+	description: string;
 }

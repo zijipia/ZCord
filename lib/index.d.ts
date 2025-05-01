@@ -194,6 +194,23 @@ export class User {
 	send(content: string | MessagePayload): Promise<Message>;
 }
 
+export class Member extends User {
+	constructor(data: any, client: Client);
+	guild_id: string;
+	guild: Guild;
+	nick: string | null;
+	premium_since: Date | null;
+	deaf: boolean;
+	mute: boolean;
+	joined_at: Date;
+	pending: boolean | null;
+	permissions: string | null;
+	communication_disabled_until: Date | null;
+	roles: string[];
+
+	edit({ nick, reason, roles, mute, deaf, channel_id, communication_disabled_until, flags }): Promise<Member>;
+}
+
 // --------------------------------------------------------------- //
 export interface RawUser {
 	id: string;
@@ -290,18 +307,12 @@ export class Client extends EventEmitter {
 	};
 	commandManager: CommandManager;
 
-	// Extend methods
-	extendUser: (user: RawUser) => ExtendedUser;
-	extendGuild: (guild: RawGuild) => ExtendedGuild;
-	extendChannel: (channel: RawChannel) => ExtendedChannel;
-	extendMessage: (message: RawMessage) => ExtendedMessage;
-	extendInteraction: (interaction: any) => ExtendedInteraction;
-
 	// Fetch methods
-	getUser: (userId: string) => Promise<ExtendedUser>;
-	getChannel: (channelId: string) => Promise<ExtendedChannel>;
-	getGuild: (guildId: string) => Promise<ExtendedGuild>;
-	getMessage: (channelId: string, messageId: string) => Promise<ExtendedMessage>;
+	getUser: (userId: string) => Promise<User>;
+	getMember: (guildId: string, userId: string) => Promise<Member>;
+	getChannel: (channelId: string) => Promise<Channel>;
+	getGuild: (guildId: string) => Promise<Guild>;
+	getMessage: (channelId: string, messageId: string) => Promise<Message>;
 
 	// Other
 	checkMessagePayload: (payload: MessagePayload) => void;

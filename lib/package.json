@@ -1,6 +1,6 @@
 {
 	"name": "zcord",
-	"version": "0.0.3",
+	"version": "0.0.4",
 	"description": "Package support discord API",
 	"main": "index.js",
 	"scripts": {

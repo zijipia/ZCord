@@ -71,12 +71,32 @@ new Client(token: string, options?: ClientOptions)
 
 | Method                                                | Description                      |
 | ----------------------------------------------------- | -------------------------------- |
-| `client.getUser(id)`                                  | Fetch and extend user info       |
-| `client.getChannel(id)`                               | Fetch and extend channel info    |
-| `client.getGuild(id)`                                 | Fetch and extend server info     |
-| `client.getMessage(channelId, messageId)`             | Fetch and extend message         |
+| `client.getUser(id)`                                  | Fetch user info                  |
+| `client.getMember(guild_id, user_id)`                 | Fetch guild member info          |
+| `client.getChannel(id)`                               | Fetch channel info               |
+| `client.getGuild(id)`                                 | Fetch server info                |
+| `client.getMessage(channelId, messageId)`             | Fetch message                    |
 | `client.commandManager.registerGlobal([...])`         | Register global slash commands   |
 | `client.commandManager.registerGuild(guildId, [...])` | Register guild-specific commands |
+
+---
+
+## 📩 Events
+
+| Events            | Parms         |
+| ----------------- | ------------- |
+| ready             | payload       |
+| messageCreate     | Message       |
+| interactionCreate | not implement |
+| voiceStateUpdate  | payload       |
+| voiceServerUpdate | payload       |
+| guildMemberAdd    | Member        |
+| guildMemberRemove | Member        |
+| PRESENCE_UPDATE   | payload       |
+| guildCreate       | Guild         |
+| --- debug         | ----          |
+| debug             | ...arg        |
+| raw               | ...arg        |
 
 ---
 
@@ -85,7 +105,7 @@ new Client(token: string, options?: ClientOptions)
 Zcord defines the following types:
 
 - `RawUser`, `RawGuild`, `RawChannel`, `RawMessage`
-- `ExtendedUser`, `ExtendedGuild`, `ExtendedChannel`, `ExtendedMessage`
+- `Guild`, `Channel`, `User`, `Member`, `Message`,
 - `CommandManager`, `WebSocketManager`
 - `ClientOptions`, `MessagePayload`
 

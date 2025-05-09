@@ -1,4 +1,4 @@
-const { Client, Attachment } = require("../../lib/index.js");
+const { Client } = require("../../lib/index.js");
 const fs = require("fs");
 
 require("dotenv").config();
@@ -11,22 +11,32 @@ const client = new Client(process.env.TOKEN, {
 	},
 	_init: true,
 	intents: 3276799,
-	presence: {
-		activities: [
-			{
-				name: "Zcordjs",
-				type: 2,
-			},
-		],
-		status: "online",
-		since: Date.now(),
-		afk: false,
-	},
+	// presence: {
+	// 	// activities: [
+	// 	// 	{
+	// 	// 		name: "Zcordjs",
+	// 	// 		type: 2,
+	// 	// 	},
+	// 	// ],
+	// 	status: "online",
+	// 	since: Date.now(),
+	// 	afk: false,
+	// },
 });
 
 client.on("ready", () => {
-	console.log(`Bot logged in as ${client.user.username}`);
-	console.log(client.Me);
+	console.log(`Bot logged in as ${client.Me.username}`);
+	client.Me.presence({
+		activities: [
+			{
+				name: "Zcordjs",
+				type: 3,
+			},
+		],
+		status: "idle",
+		since: 2000,
+		afk: false,
+	});
 });
 
 client.on("messageCreate", async (message) => {

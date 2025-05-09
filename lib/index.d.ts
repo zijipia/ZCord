@@ -1,6 +1,40 @@
 import { EventEmitter } from "events";
 
 // --------------------------------------------------------------- //
+// #region Raw
+export interface RawGuild {
+	id: string;
+	name: string;
+	[extraProps: string]: any;
+}
+
+export interface RawChannel {
+	id: string;
+	name: string;
+	type: number;
+	[extraProps: string]: any;
+}
+
+export interface RawMessage {
+	id: string;
+	content: string;
+	channel_id: string;
+	guild_id?: string;
+	author: RawUser;
+	[extraProps: string]: any;
+}
+
+export interface RawUser {
+	id: string;
+	username: string;
+	discriminator: string;
+	avatar: string | null;
+	[extraProps: string]: any;
+}
+
+//#endregion Raw
+// --------------------------------------------------------------- //
+// #region Guild
 export class Guild {
 	constructor(data: any, client: Client);
 
@@ -56,7 +90,9 @@ export class Guild {
 
 	setNickname(nickname: string): Promise<any>;
 }
+// #endregion Guild
 // --------------------------------------------------------------- //
+// #region Channel
 export class Channel {
 	constructor(data: any, client: Client);
 
@@ -102,7 +138,10 @@ export class Channel {
 	fetchMessages(limit?: number): Promise<any>;
 	delete(): Promise<any>;
 }
+// #endregion Channel
 // --------------------------------------------------------------- //
+// #region Message
+
 export interface MessagePayload {
 	content?: string;
 	tts?: boolean;
@@ -113,6 +152,13 @@ export interface MessagePayload {
 	allowed_mentions?: any;
 	message_reference?: any;
 	flags?: number;
+}
+
+export interface MessageReference {
+	message_id: string;
+	channel_id: string;
+	guild_id: string;
+	fail_if_not_exists: boolean;
 }
 
 export class Message {
@@ -163,7 +209,9 @@ export class Message {
 	reply(replyContent: string | MessagePayload): Promise<Message>;
 	edit(newContent: string | MessagePayload): Promise<Message>;
 }
+// #endregion Message
 // --------------------------------------------------------------- //
+// #region User
 export interface AvatarOptions {
 	size?: number;
 	gif?: boolean;
@@ -211,38 +259,16 @@ export class Member extends User {
 	edit({ nick, reason, roles, mute, deaf, channel_id, communication_disabled_until, flags }): Promise<Member>;
 }
 
+export class Me extends User {
+	constructor(data: any, client: Client);
+	voiceState({ channel_id, guild_id, self_mute, self_deaf }): Promise<Me>;
+	edit({ username, avatar, banner, accent_color }): Promise<Me>;
+	presence({ activities, status, since, afk }): Promise<Me>;
+}
+
+// #endregion User
 // --------------------------------------------------------------- //
-export interface RawUser {
-	id: string;
-	username: string;
-	discriminator: string;
-	avatar: string | null;
-	bot?: boolean;
-	[extraProps: string]: any;
-}
-
-export interface RawGuild {
-	id: string;
-	name: string;
-	[extraProps: string]: any;
-}
-
-export interface RawChannel {
-	id: string;
-	name: string;
-	type: number;
-	[extraProps: string]: any;
-}
-
-export interface RawMessage {
-	id: string;
-	content: string;
-	channel_id: string;
-	guild_id?: string;
-	author: RawUser;
-	[extraProps: string]: any;
-}
-
+// #region Manager
 export interface CommandManager {
 	registerGlobal(commands: any[]): Promise<any>;
 	registerGuild(guildId: string, commands: any[]): Promise<any>;
@@ -263,6 +289,17 @@ export interface WebSocketManager {
 	destroy(): void;
 }
 
+export interface ApiManager {
+	get: (url: string) => Promise<any>;
+	post: (url: string, body: any) => Promise<any>;
+	put: (url: string, body: any) => Promise<any>;
+	patch: (url: string, body: any) => Promise<any>;
+	delete: (url: string, body?: any) => Promise<any>;
+}
+
+// #endregion Manager
+// --------------------------------------------------------------- //
+// #region Client
 export interface ClientOptions {
 	intents?: number;
 	identifyProperties?: {
@@ -296,15 +333,10 @@ export class Client extends EventEmitter {
 
 	intents: number;
 	isReady: boolean;
+	Me: Me;
 
 	ws: WebSocketManager;
-	api: {
-		get: (url: string) => Promise<any>;
-		post: (url: string, body: any) => Promise<any>;
-		put: (url: string, body: any) => Promise<any>;
-		patch: (url: string, body: any) => Promise<any>;
-		delete: (url: string, body?: any) => Promise<any>;
-	};
+	api: ApiManager;
 	commandManager: CommandManager;
 
 	// Fetch methods
@@ -318,7 +350,16 @@ export class Client extends EventEmitter {
 	checkMessagePayload: (payload: MessagePayload) => void;
 	debug: (message: string, ...args: any[]) => void;
 	destroy: () => void;
+
+	// Events
+	on: (event: ClientEvents, listener: (...args: any[]) => void) => this;
+	once: (event: ClientEvents, listener: (...args: any[]) => void) => this;
+	emit: (event: ClientEvents | string, ...args: any[]) => boolean;
+	removeListener: (event: ClientEvents, listener: (...args: any[]) => void) => this;
+	addListener: (event: ClientEvents, listener: (...args: any[]) => void) => this;
+	off: (event: ClientEvents, listener: (...args: any[]) => void) => this;
 }
+// #endregion Client
 
 export interface AttachmentData {
 	name?: string;
@@ -331,3 +372,16 @@ export class Attachment {
 	name: string;
 	description: string;
 }
+
+export type ClientEvents =
+	| "ready"
+	| "raw"
+	| "debug"
+	| "messageCreate"
+	| "interactionCreate"
+	| "voiceStateUpdate"
+	| "voiceServerUpdate"
+	| "guildMemberAdd"
+	| "guildMemberRemove"
+	| "presenceUpdate"
+	| "guildCreate";

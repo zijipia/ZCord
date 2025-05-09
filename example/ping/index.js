@@ -2,6 +2,7 @@ const { Client, Attachment } = require("zcord");
 const fs = require("fs");
 
 require("dotenv").config();
+
 const client = new Client(process.env.TOKEN, {
 	identifyProperties: {
 		os: "Discord Android",
@@ -23,6 +24,7 @@ const client = new Client(process.env.TOKEN, {
 	},
 });
 
+console.log(client);
 client.on("ready", () => {
 	console.log(`Bot logged in as ${client.user.username}`);
 	// client.registerGlobalCommand({
@@ -180,10 +182,8 @@ client.on("interactionCreate", (interaction) => {
 	console.log(interaction);
 });
 
-// client.on("raw", (message, d) => {
-// 	console.log(message, d);
-// });
+client.on("raw", console.log);
 
-// client.on("debug", (...arg) => {
-// 	console.log(...arg);
-// });
+client.on("debug", (...arg) => {
+	console.log(...arg);
+});

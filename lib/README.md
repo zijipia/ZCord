@@ -32,7 +32,7 @@ const { Client } = require("zcord");
 const client = new Client("YOUR_BOT_TOKEN");
 
 client.on("ready", () => {
-	console.log(`Logged in as ${client.user.username}`);
+	console.log(`Logged in as ${client.Me.username}`);
 });
 
 client.on("messageCreate", async (message) => {

@@ -330,8 +330,11 @@ export class Client extends EventEmitter {
 		_channel: Map<string, RawChannel>;
 		_member: Map<string, any>;
 	};
-
-	intents: number;
+	/**
+	 * List of Intents
+	 * @link https://discord.com/developers/docs/topics/gateway#list-of-intents
+	 */
+	intents: [Intent];
 	isReady: boolean;
 	Me: Me;
 
@@ -374,14 +377,79 @@ export class Attachment {
 }
 
 export type ClientEvents =
-	| "ready"
-	| "raw"
+	| "READY"
+	| "INTERACTION_CREATE"
+	| "RESUMED"
+	| "VOICE_SERVER_UPDATE"
+	| "GUILD_CREATE"
+	| "GUILD_UPDATE"
+	| "GUILD_DELETE"
+	| "GUILD_ROLE_CREATE"
+	| "GUILD_ROLE_UPDATE"
+	| "GUILD_ROLE_DELETE"
+	| "THREAD_CREATE"
+	| "THREAD_UPDATE"
+	| "THREAD_DELETE"
+	| "THREAD_LIST_SYNC"
+	| "THREAD_MEMBER_UPDATE"
+	| "THREAD_MEMBERS_UPDATE"
+	| "STAGE_INSTANCE_CREATE"
+	| "STAGE_INSTANCE_UPDATE"
+	| "STAGE_INSTANCE_DELETE"
+	| "CHANNEL_CREATE"
+	| "CHANNEL_UPDATE"
+	| "CHANNEL_DELETE"
+	| "CHANNEL_PINS_UPDATE"
+	| "GUILD_MEMBER_ADD"
+	| "GUILD_MEMBER_UPDATE"
+	| "GUILD_MEMBER_REMOVE"
+	| "GUILD_BAN_ADD"
+	| "GUILD_BAN_REMOVE"
+	| "GUILD_EMOJIS_UPDATE"
+	| "GUILD_STICKERS_UPDATE"
+	| "GUILD_INTEGRATIONS_UPDATE"
+	| "GUILD_WEBHOOKS_UPDATE"
+	| "INVITE_CREATE"
+	| "INVITE_DELETE"
+	| "VOICE_STATE_UPDATE"
+	| "PRESENCE_UPDATE"
+	| "MESSAGE_CREATE"
+	| "MESSAGE_UPDATE"
+	| "MESSAGE_DELETE"
+	| "MESSAGE_DELETE_BULK"
+	| "MESSAGE_REACTION_ADD"
+	| "MESSAGE_REACTION_REMOVE"
+	| "MESSAGE_REACTION_REMOVE_ALL"
+	| "MESSAGE_REACTION_REMOVE_EMOJI"
+	| "TYPING_START"
+	| "GUILD_SCHEDULED_EVENT_CREATE"
+	| "GUILD_SCHEDULED_EVENT_UPDATE"
+	| "GUILD_SCHEDULED_EVENT_DELETE"
+	| "GUILD_SCHEDULED_EVENT_USER_ADD"
+	| "GUILD_SCHEDULED_EVENT_USER_REMOVE"
 	| "debug"
-	| "messageCreate"
-	| "interactionCreate"
-	| "voiceStateUpdate"
-	| "voiceServerUpdate"
-	| "guildMemberAdd"
-	| "guildMemberRemove"
-	| "presenceUpdate"
-	| "guildCreate";
+	| "raw";
+
+export type Intent =
+	| "ALL"
+	| "GUILDS"
+	| "GUILD_MEMBERS"
+	| "GUILD_MODERATION"
+	| "GUILD_EXPRESSIONS"
+	| "GUILD_INTEGRATIONS"
+	| "GUILD_WEBHOOKS"
+	| "GUILD_INVITES"
+	| "GUILD_VOICE_STATES"
+	| "GUILD_PRESENCES"
+	| "GUILD_MESSAGES"
+	| "GUILD_MESSAGE_REACTIONS"
+	| "GUILD_MESSAGE_TYPING"
+	| "DIRECT_MESSAGES"
+	| "DIRECT_MESSAGE_REACTIONS"
+	| "DIRECT_MESSAGE_TYPING"
+	| "MESSAGE_CONTENT"
+	| "GUILD_SCHEDULED_EVENTS"
+	| "AUTO_MODERATION_CONFIGURATION"
+	| "AUTO_MODERATION_EXECUTION"
+	| "GUILD_MESSAGE_POLLS"
+	| "DIRECT_MESSAGE_POLLS";

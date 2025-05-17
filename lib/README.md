@@ -61,7 +61,7 @@ new Client(token: string, options?: ClientOptions)
 
 | Option               | Description                                           |
 | -------------------- | ----------------------------------------------------- |
-| `intents`            | Defaults to `3276799` (all intents)                   |
+| `intents`            | Defaults to `ALL` (all intents)                       |
 | `_init`              | Automatically connects to gateway if `true` (default) |
 | `identifyProperties` | Customize `os`, `browser`, and `device` info          |
 
@@ -83,20 +83,61 @@ new Client(token: string, options?: ClientOptions)
 
 ## 📩 Events
 
-| Events            | Parms         |
-| ----------------- | ------------- |
-| ready             | payload       |
-| messageCreate     | Message       |
-| interactionCreate | not implement |
-| voiceStateUpdate  | payload       |
-| voiceServerUpdate | payload       |
-| guildMemberAdd    | Member        |
-| guildMemberRemove | Member        |
-| PRESENCE_UPDATE   | payload       |
-| guildCreate       | Guild         |
-| --- debug         | ----          |
-| debug             | ...arg        |
-| raw               | ...arg        |
+| Events                            | Parms   |
+| --------------------------------- | ------- |
+| READY                             | payload |
+| INTERACTION_CREATE                | Message |
+| RESUMED                           | payload |
+| VOICE_SERVER_UPDATE               | payload |
+| GUILD_CREATE                      | Guild   |
+| GUILD_UPDATE                      | Guild   |
+| GUILD_DELETE                      | Guild   |
+| GUILD_ROLE_CREATE                 | Guild   |
+| GUILD_ROLE_UPDATE                 | Guild   |
+| GUILD_ROLE_DELETE                 | Guild   |
+| THREAD_CREATE                     | payload |
+| THREAD_UPDATE                     | payload |
+| THREAD_DELETE                     | payload |
+| THREAD_LIST_SYNC                  | payload |
+| THREAD_MEMBER_UPDATE              | payload |
+| THREAD_MEMBERS_UPDATE             | payload |
+| STAGE_INSTANCE_CREATE             | payload |
+| STAGE_INSTANCE_UPDATE             | payload |
+| STAGE_INSTANCE_DELETE             | payload |
+| CHANNEL_CREATE                    | payload |
+| CHANNEL_UPDATE                    | payload |
+| CHANNEL_DELETE                    | payload |
+| CHANNEL_PINS_UPDATE               | payload |
+| GUILD_MEMBER_ADD                  | Member  |
+| GUILD_MEMBER_UPDATE               | Member  |
+| GUILD_MEMBER_REMOVE               | Member  |
+| GUILD_BAN_ADD                     | payload |
+| GUILD_BAN_REMOVE                  | payload |
+| GUILD_EMOJIS_UPDATE               | payload |
+| GUILD_STICKERS_UPDATE             | payload |
+| GUILD_INTEGRATIONS_UPDATE         | payload |
+| GUILD_WEBHOOKS_UPDATE             | payload |
+| INVITE_CREATE                     | payload |
+| INVITE_DELETE                     | payload |
+| VOICE_STATE_UPDATE                | payload |
+| PRESENCE_UPDATE                   | payload |
+| MESSAGE_CREATE                    | Message |
+| MESSAGE_UPDATE                    | Message |
+| MESSAGE_DELETE                    | Message |
+| MESSAGE_DELETE_BULK               | Message |
+| MESSAGE_REACTION_ADD              | Message |
+| MESSAGE_REACTION_REMOVE           | Message |
+| MESSAGE_REACTION_REMOVE_ALL       | Message |
+| MESSAGE_REACTION_REMOVE_EMOJI     | Message |
+| TYPING_START                      | payload |
+| GUILD_SCHEDULED_EVENT_CREATE      | payload |
+| GUILD_SCHEDULED_EVENT_UPDATE      | payload |
+| GUILD_SCHEDULED_EVENT_DELETE      | payload |
+| GUILD_SCHEDULED_EVENT_USER_ADD    | payload |
+| GUILD_SCHEDULED_EVENT_USER_REMOVE | payload |
+| --- debug                         | ----    |
+| debug                             | ...arg  |
+| raw                               | ...arg  |
 
 ---
 

@@ -8,7 +8,7 @@
 ## 🚀 Features
 
 - Directly connects to the Discord Gateway via WebSocket
-- Sends/receives events such as `messageCreate`, `interactionCreate`, `guildCreate`, ...
+- Sends/receives events such as `MESSAGE_CREATE`, `INTERACTION_CREATE`, `GUILD_CREATE`, ...
 - Uses Discord's REST API to:
   - Send messages
   - Create global or guild-specific slash commands
@@ -35,7 +35,7 @@ client.on("ready", () => {
 	console.log(`Logged in as ${client.Me.username}`);
 });
 
-client.on("messageCreate", async (message) => {
+client.on("MESSAGE_CREATE", async (message) => {
 	if (message.content === "!test") {
 		const msg = await message.reply("Pong! 🏓"); //reply messenger
 		const user = await message.user;

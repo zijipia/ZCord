@@ -7,33 +7,17 @@ const client = new Client(process.env.TOKEN, {
 		browser: "Discord Android",
 		device: process.platform,
 	},
-	_init: true,
-	intents: 3276799,
-	presence: {
-		activities: [
-			{
-				name: "Zcordjs",
-				type: 2,
-			},
-		],
-		status: "online",
-		since: Date.now(),
-		afk: false,
-	},
 });
 
-client.on("ready", () => {
-	console.log(`Bot logged in as ${client.user.username}`);
+client.on("READY", () => {
+	console.log(`Bot logged in as ${client.Me.username}`);
 });
 
-client.on("messageCreate", async (message) => {
-	if (message.content === "ping") {
-		message.reply("pong");
-	}
+client.on("MESSAGE_CREATE", async (message) => {
 	if (message.content === "test") {
 		const file1 = new Attachment("./Attachment/nyan-cat.gif", { name: "cat.gif" });
-
 		const file2 = await Attachment.fromUrl(message.user.getAvatarURL(), { name: "zavt.gif" });
+
 		message.reply({
 			content: "Tài liệu đính kèm:",
 			files: [file1, file2],

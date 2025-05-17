@@ -25,13 +25,10 @@ const client = new Client(process.env.TOKEN, {
 });
 
 client.on("READY", () => {
-	console.log(`Bot logged in as ${client.user.username}`);
+	console.log(`Bot logged in as ${client.Me.username}`);
 });
 
 client.on("MESSAGE_CREATE", async (message) => {
-	console.log("messageCreate:" + message?.type + " " + message?.content);
-	console.log(message);
-
 	if (message.content === "newcomp") {
 		const msg = await message.reply({
 			flags: 32768,
@@ -167,13 +164,3 @@ client.on("MESSAGE_CREATE", async (message) => {
 		});
 	}
 });
-
-//interactionCreate
-client.on("interactionCreate", (interaction) => {
-	console.log("interactionCreate:" + interaction?.type);
-	console.log(interaction);
-});
-
-// client.on("raw", console.log);
-
-// client.on("debug", console.log);
